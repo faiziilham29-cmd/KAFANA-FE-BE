@@ -4,18 +4,16 @@ import API from '../api';
 import SidebarUser from '../components/SidebarUser';
 import HeroBanner from '../components/HeroBanner';
 import SEOInfoSection from '../components/SEOInfoSection';
-import TestimonialSection from '../components/TestimoniSection'; // atau sesuai path file kamu
+import TestimonialSection from '../components/TestimoniSection';
 
 // HELPER FORMAT HARGA ANTI-CRASH & ANTI-NOL TAMBAHAN
 const formatPrice = (val) => {
   if (!val && val !== 0) return 'Rp 0';
 
-  // Jika sudah string berformat "Rp xxx"
   if (typeof val === 'string' && val.trim().startsWith('Rp')) return val.trim();
 
   let cleanStr = String(val).trim();
 
-  
   if (cleanStr.includes('.') || cleanStr.includes(',')) {
     cleanStr = cleanStr.split('.')[0].split(',')[0];
   }
@@ -30,7 +28,7 @@ const formatPrice = (val) => {
     : `Rp ${num.toLocaleString('id-ID')}`;
 };
 
-// Helper Format URL Gambar (Mendukung field main_image dari backend)
+// Helper Format URL Gambar
 const formatImage = (item) => {
   const rawImage = item?.main_image || item?.foto || item?.gambar || item?.image || item?.image_url;
   if (!rawImage) return '/KOST ANDARA VISTA.png';
@@ -63,17 +61,14 @@ export default function Home() {
         const res = await API.get('/properties');
         console.log("📦 Response Mentah Backend:", res.data);
 
-        // Ekstraksi array data dari response
         const apiData = res.data?.data || res.data?.properties || (Array.isArray(res.data) ? res.data : []);
         
         if (apiData.length === 0) {
-          console.warn("⚠️ Data backend kosong, menggunakan fallback data dummy.");
-          setRooms(getFallbackRooms());
+          console.warn("⚠️ Data backend kosong.");
+          setRooms([]);
           return;
         }
 
-        // Penyesuaian struktur field sesuai response Laravel:
-        // title, price_per_month, address, gender_type, type, facilities, main_image
         const formattedRooms = apiData.map((item, idx) => ({
           id: item?.id || idx + 1,
           name: item?.title || item?.nama_properti || item?.nama || item?.name || 'Hunian Tanpa Nama',
@@ -90,8 +85,7 @@ export default function Home() {
 
         setRooms(formattedRooms);
       } catch (error) {
-        console.error('❌ Gagal memuat data dari API, pindah ke Fallback:', error);
-        setRooms(getFallbackRooms());
+        console.error('❌ Gagal memuat data dari API:', error);
       } finally {
         setLoading(false);
       }
@@ -109,10 +103,10 @@ export default function Home() {
     }
   };
 
-    // Navigasi Langsung ke Halaman Detail Properti
-    const handleGoToDetail = (room) => {
-      navigate(`/kamar/${room.id}`, { state: { room } });
-    };
+  // Navigasi Langsung ke Halaman Detail Properti
+  const handleGoToDetail = (room) => {
+    navigate(`/kamar/${room.id}`, { state: { room } });
+  };
 
   // Navigasi Langsung ke Pembayaran
   const handleBooking = (room) => {
@@ -163,12 +157,36 @@ export default function Home() {
     <SidebarUser>
       <div className="bg-[#FAF5EF] text-[#2D2321] font-sans antialiased pb-16">
         
+        {/* CSS INTERNAL ANIMASI SIMPLE UNTUK KARTU */}
+        <style>
+          {`
+            @keyframes cardFadeUp {
+              0% { 
+                opacity: 0; 
+                transform: translateY(20px); 
+              }
+              100% { 
+                opacity: 1; 
+                transform: translateY(0); 
+              }
+            }
+            .animate-card-up {
+              animation: cardFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+              opacity: 0;
+            }
+            .delay-100 { animation-delay: 100ms; }
+            .delay-200 { animation-delay: 200ms; }
+            .delay-300 { animation-delay: 300ms; }
+            .delay-400 { animation-delay: 400ms; }
+          `}
+        </style>
+
         {/* HERO BANNER */}
         <HeroBanner autoSlideInterval={4000} />
 
         {/* CARD BANNER PROMO */}
         <div className="space-y-6 mb-16">
-          <div className="bg-gradient-to-r from-[#FAF5EF] via-white to-[#FAF5EF] rounded-2xl border border-[#D7C4B0]/60 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
+          <div className="bg-gradient-to-r from-[#FAF5EF] via-white to-[#FAF5EF] rounded-2xl border border-[#D7C4B0]/60 p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative animate-card-up delay-100">
             <div className="space-y-3 max-w-xl z-10">
               <h3 className="text-xl md:text-2xl font-extrabold text-[#261C19]">
                 Daftarkan Properti Anda di Kafana Vista
@@ -176,28 +194,28 @@ export default function Home() {
               <p className="text-xs text-gray-600 leading-relaxed">
                 Berbagai fitur dan layanan manajemen sewa terpadu untuk meningkatkan okupansi bisnis kost &amp; kontrakan Anda.
               </p>
-           <a
-  href="https://wa.me/6283808699130?text=Halo%20Admin%20Kafana%20Vista,%20saya%20butuh%20bantuan"
-  target="_blank"
-  rel="noreferrer"
-  className="w-fit justify-center bg-[#B38E5D] hover:bg-[#8F6E45] text-white px-6 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-lg flex items-center gap-2 whitespace-nowrap cursor-pointer"
->
-  <span>💬 Chat Customer Service</span>
-</a>
+              <a
+                href="https://wa.me/6283808699130?text=Halo%20Admin%20Kafana%20Vista,%20saya%20butuh%20bantuan"
+                target="_blank"
+                rel="noreferrer"
+                className="w-fit justify-center bg-[#B38E5D] hover:bg-[#8F6E45] text-white px-6 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-lg flex items-center gap-2 whitespace-nowrap cursor-pointer hover:-translate-y-0.5"
+              >
+                <span>💬 Chat Customer Service</span>
+              </a>
             </div>
             
             <div className="w-full md:w-64 h-36 rounded-xl overflow-hidden shadow-md flex-shrink-0">
               <img 
                 src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=600&q=80" 
                 alt="Mitra Kafana Vista"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover hover:scale-105 transition duration-500"
                 onError={handleImageError}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl border border-[#D7C4B0]/60 p-6 shadow-sm flex flex-col justify-between space-y-4 hover:shadow-md transition">
+            <div className="bg-white rounded-2xl border border-[#D7C4B0]/60 p-6 shadow-sm flex flex-col justify-between space-y-4 hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-card-up delay-200">
               <div className="space-y-2">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#B38E5D] bg-[#FAF5EF] px-2.5 py-1 rounded">
                   Gratis &amp; Aman
@@ -215,7 +233,7 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="bg-white rounded-2xl border border-[#D7C4B0]/60 p-6 shadow-sm flex items-center justify-between gap-4 hover:shadow-md transition">
+            <div className="bg-white rounded-2xl border border-[#D7C4B0]/60 p-6 shadow-sm flex items-center justify-between gap-4 hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-card-up delay-300">
               <div className="space-y-2 max-w-xs">
                 <h4 className="text-lg font-bold text-[#261C19]">Hunian Terjamin Nyaman</h4>
                 <p className="text-xs text-gray-500 leading-relaxed">
@@ -232,7 +250,7 @@ export default function Home() {
 
         {/* INFO BAR */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-          <div className="bg-white p-5 rounded-xl border border-[#D7C4B0]/60 shadow-sm flex items-center gap-4">
+          <div className="bg-white p-5 rounded-xl border border-[#D7C4B0]/60 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex items-center gap-4 animate-card-up delay-100">
             <div className="p-3 bg-[#B38E5D]/10 rounded-lg text-2xl">⚡</div>
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#B38E5D]">Respon Cepat</h4>
@@ -240,7 +258,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-xl border border-[#D7C4B0]/60 shadow-sm flex items-center gap-4">
+          <div className="bg-white p-5 rounded-xl border border-[#D7C4B0]/60 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex items-center gap-4 animate-card-up delay-200">
             <div className="p-3 bg-[#B38E5D]/10 rounded-lg text-2xl">📍</div>
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#B38E5D]">Lokasi Strategis</h4>
@@ -248,7 +266,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-xl border border-[#D7C4B0]/60 shadow-sm flex items-center gap-4">
+          <div className="bg-white p-5 rounded-xl border border-[#D7C4B0]/60 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex items-center gap-4 animate-card-up delay-300">
             <div className="p-3 bg-[#B38E5D]/10 rounded-lg text-2xl">🛡️</div>
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#B38E5D]">100% Tervalidasi</h4>
@@ -308,12 +326,15 @@ export default function Home() {
                 Mengambil data dari server...
               </div>
             ) : filteredRooms.length > 0 ? (
-              filteredRooms.map((room) => {
+              filteredRooms.map((room, idx) => {
                 const isFav = favorites.includes(room.id);
+                const staggeredDelay = (idx % 4) * 100; // Efek muncul bergantian per baris
+
                 return (
                   <div 
                     key={room.id} 
-                    className="group bg-white rounded-xl border border-[#D7C4B0]/60 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                    style={{ animationDelay: `${staggeredDelay}ms` }}
+                    className="group bg-white rounded-xl border border-[#D7C4B0]/60 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between animate-card-up"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
                       <img 
@@ -388,7 +409,7 @@ export default function Home() {
                 );
               })
             ) : (
-              <div className="col-span-full bg-white p-12 text-center rounded-xl border border-dashed border-[#D7C4B0]">
+              <div className="col-span-full bg-white p-12 text-center rounded-xl border border-dashed border-[#D7C4B0] animate-card-up">
                 <p className="text-gray-400 font-medium text-sm">Tidak ada hunian yang cocok dengan pencarian "{searchQuery}".</p>
                 <button 
                   onClick={() => { setSearchQuery(''); setSelectedCategory('Semua'); }}
@@ -410,23 +431,23 @@ export default function Home() {
                 <img 
                   src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=600&q=80" 
                   alt="Interior Details" 
-                  className="w-full object-cover aspect-[3/4] rounded-xl border border-[#B38E5D]/30 shadow-lg" 
+                  className="w-full object-cover aspect-[3/4] rounded-xl border border-[#B38E5D]/30 shadow-lg hover:scale-105 transition duration-500 animate-card-up delay-100" 
                   onError={handleImageError}
                 />
-                <div className="bg-[#B38E5D] p-5 rounded-xl text-[#FAF5EF] text-center space-y-1">
+                <div className="bg-[#B38E5D] p-5 rounded-xl text-[#FAF5EF] text-center space-y-1 shadow-md hover:-translate-y-1 transition duration-300 animate-card-up delay-200">
                   <p className="text-3xl font-black">100%</p>
                   <p className="text-[10px] uppercase font-bold tracking-widest">Verified Properties</p>
                 </div>
               </div>
               <div className="space-y-4 pt-6">
-                <div className="bg-[#FAF5EF] text-[#2D2321] p-5 rounded-xl text-center space-y-1 border border-[#B38E5D]/20">
+                <div className="bg-[#FAF5EF] text-[#2D2321] p-5 rounded-xl text-center space-y-1 border border-[#B38E5D]/20 shadow-md hover:-translate-y-1 transition duration-300 animate-card-up delay-300">
                   <p className="text-2xl font-black text-[#B38E5D]">Instant</p>
                   <p className="text-[10px] uppercase font-extrabold tracking-wider text-gray-600">Booking Confirmation</p>
                 </div>
                 <img 
                   src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=400&q=80" 
                   alt="Room Lifestyle" 
-                  className="w-full object-cover aspect-[3/4] rounded-xl border border-[#B38E5D]/30 shadow-lg" 
+                  className="w-full object-cover aspect-[3/4] rounded-xl border border-[#B38E5D]/30 shadow-lg hover:scale-105 transition duration-500 animate-card-up delay-400" 
                   onError={handleImageError}
                 />
               </div>
@@ -444,7 +465,7 @@ export default function Home() {
               <div className="pt-2">
                 <button 
                   onClick={() => navigate('/carihunian')}
-                  className="text-xs font-bold uppercase tracking-widest bg-[#FAF5EF] hover:bg-[#B38E5D] text-[#2D2321] hover:text-white px-6 py-3.5 rounded-lg transition duration-300 shadow-md cursor-pointer"
+                  className="text-xs font-bold uppercase tracking-widest bg-[#FAF5EF] hover:bg-[#B38E5D] text-[#2D2321] hover:text-white px-6 py-3.5 rounded-lg transition duration-300 shadow-md cursor-pointer hover:-translate-y-0.5"
                 >
                   Eksplorasi Semua Kost &amp; Kontrakan
                 </button>
@@ -454,13 +475,13 @@ export default function Home() {
           </div>
         </section>
 
-       {/* 3. SECTION TESTIMONI PENGGUNA */}
-      <TestimonialSection />
+        {/* SECTION TESTIMONI PENGGUNA */}
+        <TestimonialSection />
 
         {/* MODAL DETAIL */}
         {selectedRoom && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-[#D7C4B0] animate-in fade-in zoom-in duration-200">
+            <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-[#D7C4B0] animate-card-up">
               <div className="relative h-56 bg-gray-200">
                 <img 
                   src={selectedRoom.image} 

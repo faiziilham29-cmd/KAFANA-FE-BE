@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import API from '../api'; 
 import SidebarUser from '../components/SidebarUser'; 
-import Swal from 'sweetalert2'; // 👈 Import SweetAlert2
+import Swal from 'sweetalert2';
 
 export default function FinanceTracker() {
   // 1. STATE UNTUK DATA TRANSAKSI & SUMMARY
@@ -17,9 +17,9 @@ export default function FinanceTracker() {
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
-    type: 'pengeluaran', // Default 'pengeluaran'
+    type: 'pengeluaran',
     category: 'Makanan',
-    date: new Date().toISOString().split('T')[0] // YYYY-MM-DD
+    date: new Date().toISOString().split('T')[0]
   });
 
   // =========================================================================
@@ -94,7 +94,6 @@ export default function FinanceTracker() {
 
       const res = await API.post('/finance-tracker', payload);
 
-      // SweetAlert Sukses Tambah Transaksi
       Swal.fire({
         icon: 'success',
         title: 'Berhasil!',
@@ -103,7 +102,6 @@ export default function FinanceTracker() {
         showConfirmButton: false
       });
 
-      // Reset Form
       setFormData({
         description: '',
         amount: '',
@@ -138,7 +136,6 @@ export default function FinanceTracker() {
   };
 
   const handleDelete = async (id) => {
-    // SweetAlert Konfirmasi Hapus
     const result = await Swal.fire({
       title: 'Hapus Transaksi?',
       text: 'Transaksi yang dihapus tidak dapat dikembalikan!',
@@ -182,12 +179,36 @@ export default function FinanceTracker() {
 
   return (
     <SidebarUser> 
+      {/* CSS INTERNAL ANIMASI */}
+      <style>
+        {`
+          @keyframes fadeSlideUp {
+            0% { 
+              opacity: 0; 
+              transform: translateY(20px); 
+            }
+            100% { 
+              opacity: 1; 
+              transform: translateY(0); 
+            }
+          }
+          .animate-fade-up {
+            animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+          }
+          .delay-100 { animation-delay: 100ms; }
+          .delay-200 { animation-delay: 200ms; }
+          .delay-300 { animation-delay: 300ms; }
+          .delay-400 { animation-delay: 400ms; }
+        `}
+      </style>
+
       {/* WRAPPER UTAMA */}
       <div className="p-6 lg:p-8 w-full text-[#261C19] pb-12 font-sans min-h-screen flex flex-col justify-between">
         
         <div>
           {/* HEADER SECTION */}
-          <header className="mb-8 bg-white p-6 rounded-xl border border-[#D7C4B0] shadow-sm">
+          <header className="mb-8 bg-white p-6 rounded-xl border border-[#D7C4B0] shadow-sm animate-fade-up delay-100">
             <span className="font-sans text-xs font-bold text-[#B38E5D] uppercase tracking-widest block mb-1">
               Personal Assistant
             </span>
@@ -201,7 +222,7 @@ export default function FinanceTracker() {
 
           {/* SUMMARY CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-7">
-            <div className="bg-[#261C19] p-6 rounded-xl shadow-lg border border-[#3D2D29] text-white relative overflow-hidden flex flex-col justify-between">
+            <div className="bg-[#261C19] p-6 rounded-xl shadow-lg border border-[#3D2D29] text-white relative overflow-hidden flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 animate-fade-up delay-100">
               <div className="relative z-10">
                 <p className="text-xs font-bold text-[#D7C4B0] uppercase tracking-wider mb-2">Saldo Saat Ini</p>
                 <h3 className="text-3xl lg:text-4xl font-black text-[#FAF5EF]">{formatRupiah(summary.saldo)}</h3>
@@ -211,14 +232,14 @@ export default function FinanceTracker() {
               </svg>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-[#D7C4B0] flex flex-col justify-between">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-[#D7C4B0] flex flex-col justify-between hover:-translate-y-1 hover:shadow-md transition-all duration-300 animate-fade-up delay-200">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Total Pemasukan
               </p>
               <h3 className="text-3xl lg:text-4xl font-black text-[#261C19]">{formatRupiah(summary.pemasukan)}</h3>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-[#D7C4B0] flex flex-col justify-between">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-[#D7C4B0] flex flex-col justify-between hover:-translate-y-1 hover:shadow-md transition-all duration-300 animate-fade-up delay-300">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Total Pengeluaran
               </p>
@@ -230,7 +251,7 @@ export default function FinanceTracker() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
 
             {/* KOLOM KIRI: FORM TAMBAH TRANSAKSI */}
-            <div className="lg:col-span-4 flex flex-col">
+            <div className="lg:col-span-4 flex flex-col animate-fade-up delay-300">
               <div className="bg-white p-6 rounded-xl shadow-sm border border-[#D7C4B0] h-full flex flex-col justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-[#261C19] mb-4 border-b border-slate-100 pb-3">Catat Transaksi</h2>
@@ -238,11 +259,11 @@ export default function FinanceTracker() {
                   <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Opsi Jenis Transaksi */}
                     <div className="flex gap-3">
-                      <label className={`flex-1 text-center py-2.5 rounded border cursor-pointer font-bold text-xs uppercase tracking-widest transition-all ${formData.type === 'pemasukan' ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-slate-200 text-slate-400 hover:bg-slate-50'}`}>
+                      <label className={`flex-1 text-center py-2.5 rounded border cursor-pointer font-bold text-xs uppercase tracking-widest transition-all ${formData.type === 'pemasukan' ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm' : 'border-slate-200 text-slate-400 hover:bg-slate-50'}`}>
                         <input type="radio" name="type" value="pemasukan" checked={formData.type === 'pemasukan'} onChange={handleChange} className="hidden" />
                         Pemasukan
                       </label>
-                      <label className={`flex-1 text-center py-2.5 rounded border cursor-pointer font-bold text-xs uppercase tracking-widest transition-all ${formData.type === 'pengeluaran' ? 'bg-rose-50 border-rose-500 text-rose-700' : 'border-slate-200 text-slate-400 hover:bg-slate-50'}`}>
+                      <label className={`flex-1 text-center py-2.5 rounded border cursor-pointer font-bold text-xs uppercase tracking-widest transition-all ${formData.type === 'pengeluaran' ? 'bg-rose-50 border-rose-500 text-rose-700 shadow-sm' : 'border-slate-200 text-slate-400 hover:bg-slate-50'}`}>
                         <input type="radio" name="type" value="pengeluaran" checked={formData.type === 'pengeluaran'} onChange={handleChange} className="hidden" />
                         Pengeluaran
                       </label>
@@ -250,18 +271,18 @@ export default function FinanceTracker() {
 
                     <div className="space-y-1">
                       <label className="block text-xs font-bold text-slate-600 uppercase">Keterangan</label>
-                      <input type="text" name="description" value={formData.description} onChange={handleChange} placeholder="Cth: Makan Siang" className="w-full px-4 py-2.5 bg-slate-50 border border-[#D7C4B0] rounded text-sm outline-none focus:ring-1 focus:ring-[#B38E5D]" required />
+                      <input type="text" name="description" value={formData.description} onChange={handleChange} placeholder="Cth: Makan Siang" className="w-full px-4 py-2.5 bg-slate-50 border border-[#D7C4B0] rounded text-sm outline-none focus:ring-1 focus:ring-[#B38E5D] transition-all" required />
                     </div>
 
                     <div className="space-y-1">
                       <label className="block text-xs font-bold text-slate-600 uppercase">Nominal (Rp)</label>
-                      <input type="number" name="amount" value={formData.amount} onChange={handleChange} placeholder="Cth: 50000" className="w-full px-4 py-2.5 bg-slate-50 border border-[#D7C4B0] rounded text-sm outline-none focus:ring-1 focus:ring-[#B38E5D]" required />
+                      <input type="number" name="amount" value={formData.amount} onChange={handleChange} placeholder="Cth: 50000" className="w-full px-4 py-2.5 bg-slate-50 border border-[#D7C4B0] rounded text-sm outline-none focus:ring-1 focus:ring-[#B38E5D] transition-all" required />
                     </div>
 
                     {formData.type === 'pengeluaran' && (
                       <div className="space-y-1">
                         <label className="block text-xs font-bold text-slate-600 uppercase">Kategori Kebutuhan</label>
-                        <select name="category" value={formData.category} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 border border-[#D7C4B0] rounded text-sm outline-none focus:ring-1 focus:ring-[#B38E5D]">
+                        <select name="category" value={formData.category} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 border border-[#D7C4B0] rounded text-sm outline-none focus:ring-1 focus:ring-[#B38E5D] cursor-pointer transition-all">
                           <option value="Makanan">Makanan & Minuman</option>
                           <option value="Transportasi">Transportasi</option>
                           <option value="Tagihan Kost">Tagihan Kost / Kontrakan</option>
@@ -274,10 +295,10 @@ export default function FinanceTracker() {
 
                     <div className="space-y-1">
                       <label className="block text-xs font-bold text-slate-600 uppercase">Tanggal</label>
-                      <input type="date" name="date" value={formData.date} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 border border-[#D7C4B0] rounded text-sm outline-none focus:ring-1 focus:ring-[#B38E5D]" required />
+                      <input type="date" name="date" value={formData.date} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 border border-[#D7C4B0] rounded text-sm outline-none focus:ring-1 focus:ring-[#B38E5D] transition-all" required />
                     </div>
 
-                    <button type="submit" className="w-full bg-[#B38E5D] hover:bg-[#8F6E45] text-white py-3 mt-4 text-xs font-bold uppercase tracking-widest rounded transition shadow-md shadow-[#B38E5D]/20">
+                    <button type="submit" className="w-full bg-[#B38E5D] hover:bg-[#8F6E45] text-white py-3 mt-4 text-xs font-bold uppercase tracking-widest rounded transition-all duration-300 shadow-md shadow-[#B38E5D]/20 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
                       Simpan Transaksi
                     </button>
                   </form>
@@ -286,7 +307,7 @@ export default function FinanceTracker() {
             </div>
 
             {/* KOLOM KANAN: TABEL RIWAYAT */}
-            <div className="lg:col-span-8 flex flex-col">
+            <div className="lg:col-span-8 flex flex-col animate-fade-up delay-400">
               <div className="bg-white rounded-xl shadow-sm border border-[#D7C4B0] overflow-hidden flex flex-col h-full min-h-[450px]">
                 <div className="px-6 py-4 border-b border-slate-100 bg-[#FAF5EF]/50 flex justify-between items-center">
                   <h2 className="text-lg font-bold text-[#261C19]">Riwayat Mutasi</h2>
@@ -310,7 +331,7 @@ export default function FinanceTracker() {
                           <td colSpan="5" className="px-6 py-12 text-center text-slate-400">Memuat data dari database...</td>
                         </tr>
                       ) : transactions.length > 0 ? transactions.map((trx) => (
-                        <tr key={trx.id} className="hover:bg-slate-50 transition">
+                        <tr key={trx.id} className="hover:bg-slate-50 transition-colors duration-200">
                           <td className="px-6 py-4 text-slate-500">{trx.date}</td>
                           <td className="px-6 py-4 font-bold text-[#261C19]">{trx.description}</td>
                           <td className="px-6 py-4">
@@ -322,7 +343,7 @@ export default function FinanceTracker() {
                             {trx.type === 'pemasukan' ? '+' : '-'} {formatRupiah(trx.amount)}
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <button onClick={() => handleDelete(trx.id)} className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition" title="Hapus">
+                            <button onClick={() => handleDelete(trx.id)} className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-all duration-200 cursor-pointer" title="Hapus">
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                               </svg>
